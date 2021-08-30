@@ -1,10 +1,23 @@
 {
   "name": "doitnatural-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Do It Natural API",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon -r esm ./build/app.js",
+    "build": "babel --out-dir build --source-maps --copy-files ./src",
+    "dev": "nodemon --inspect --exec babel-node ./src/app",
+    "test": "npm run test:db:migrate && NODE_ENV=test mocha --recursive --exit --require @babel/register --timeout 10000",
+    "test:db:create": "NODE_ENV=test babel-node scripts/database/create-test-db",
+    "test:db:delete": "NODE_ENV=test babel-node scripts/database/delete-test-db",
+    "test:db:migrate": "knex --dbConnection db/dbConnection.js migrate:latest --env test",
+    "test:db:reset": "npm run test:db:delete && npm run test:db:create && npm run test:db:migrate",
+    "db:create": "babel-node scripts/database/create-dev-db",
+    "db:delete": "babel-node scripts/database/delete-dev-db",
+    "db:migrate": "knex --dbConnection db/dbConnection.js migrate:latest",
+    "db:prepare": "npm run db:delete && npm run db:create && npm run db:migrate",
+    "db:seed": "knex --dbConnection db/dbConnection.js seed:run",
+    "db:reset": "npm run db:prepare && npm run db:seed"
   },
   "repository": {
     "type": "git",
@@ -17,6 +30,17 @@
   },
   "homepage": "https://github.com/alexannebrunold/doitnatural-api#readme",
   "dependencies": {
+    "@babel/cli": "7.10.5",
+    "@babel/core": "7.11.4",
+    "@babel/node": "7.10.5",
+    "@babel/plugin-proposal-class-properties": "7.7.4",
+    "@babel/plugin-proposal-do-expressions": "7.6.0",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "7.7.4",
+    "@babel/plugin-proposal-optional-chaining": "7.6.0",
+    "@babel/plugin-proposal-private-methods": "7.7.4",
+    "@babel/plugin-proposal-throw-expressions": "7.7.4",
+    "@babel/preset-env": "7.5.5",
+    "@babel/register": "7.10.5",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "chai": "^4.3.4",
@@ -26,7 +50,6 @@
     "chai-kekka": "^1.0.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
-    "eslint": "^7.32.0",
     "express": "^4.17.1",
     "faker": "^5.5.3",
     "jsonwebtoken": "^8.5.1",
@@ -39,5 +62,8 @@
     "sinon-chai": "^3.7.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
-  }
+  },
+  "devDependencies": {},
+  "keywords": [],
+  "type": "module"
 }
