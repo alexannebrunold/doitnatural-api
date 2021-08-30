@@ -1,12 +1,11 @@
 import validUser from '../middlewares/validations.js'
-import bcrypt from 'bcrypt'
 import db from '../config/dbConnection.js'
 import jwt from 'jsonwebtoken'
 import config from '../config/auth.config.js'
 import passwordUtils from '../utils/passwordUtils.js'
 
 function createNewUser(req, res, next) {
-  if (validUser.validUser(req.body)) {
+  if (validUser.validUserInformations(req.body)) {
     userIsInDB({ user: req.body }).then((user) => {
       if (user === undefined) {
         passwordUtils.hashPassword(req.body.password).then((passwordHashed) => {

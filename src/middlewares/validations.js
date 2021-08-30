@@ -1,13 +1,7 @@
-// //Function to validate post Book
-// function validBook(book) {
-//   const hasTitle = typeof book.title === 'string' && book.title.trim() != '';
-//   const hasAuthor = typeof book.author === 'string' && book.author.trim() != '';
-//   return hasTitle && hasAuthor;
-// }
-
-//Function to validate User
+//Function to validate User informations
 const verificationEmail = /\S+@\S+\.\S+/;
-function validUser(user) {
+
+function validUserInformations(user) {
   const hasName = typeof user.name === 'string' && user.name.trim() != '' && user.name.length >= 3;
   const hasEmail =
     typeof user.email === 'string' && user.email.trim() != '' && verificationEmail.test(user.email);
@@ -16,6 +10,5 @@ function validUser(user) {
 }
 
 export default {
-  // validBook,
-  validUser,
+  validUserInformations,
 }
