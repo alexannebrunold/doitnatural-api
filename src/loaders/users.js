@@ -57,7 +57,6 @@ function insertNewUserInDb({ user, passwordHashed}) {
 }
 
 function userIsInDB({ user }) {
-  console.log('user.email', user.email)
   return (
     db('users')
       .select('*')
@@ -67,7 +66,48 @@ function userIsInDB({ user }) {
   )
 }
 
+function userConnexion(req, res, next) {
+  userIsInDB({ user: req.body })
+    .then((user) => {
+      if (user) {
+        return passwordUtils
+          .comparePassword(req.body.password, { user: user })
+          .then((isPasswordTheSame) => {
+            if (!isPasswordTheSame) {
+              res.status(401).json({
+                error: 'Unauthorized Access!',
+              })
+            } else {
+              return jwt.sign(
+                { user: user },
+                process.env.JWT_SECRET_KEY,
+                { expiresIn: '30s' },
+                (error, token) => {
+                  res.json({ token })
+                },
+              )
+            }
+          })
+      } else {
+        next(new Error('Invalid Loggin'))
+      }
+    })
+    .catch((err) => {
+      return res.json({ status: 401, message: err + 'Message derreur', data: null })
+    })
+  next()
+}
+
+// res.status(200).send({
+  //             id: user.id,
+  //             username: user.username,
+  //             email: user.email,
+  //             roles: authorities,
+  //             accessToken: token,
+  //           })
+
 export default {
   createNewUser,
-  userIsInDB
+  userIsInDB,
+  userConnexion
 }
