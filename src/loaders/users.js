@@ -10,8 +10,8 @@ function createNewUser(req, res, next) {
       if (user === undefined) {
         passwordUtils.hashPassword(req.body.password).then((passwordHashed) => {
           insertNewUserInDb({ user: req, passwordHashed })
-            .then(() => {
-              res.redirect('/book')
+            .then((token) => {
+              res.status(200).json({ token: token })
             })
         })
           .catch((error) => {
@@ -34,24 +34,18 @@ function createNewUser(req, res, next) {
   }
 }
 
-function insertNewUserInDb({ user, passwordHashed}) {
+function insertNewUserInDb({ user, passwordHashed }) {
   return (
     db('users')
       .insert({
-        first_name: user.body.name,
+        first_name: user.body.first_name,
         email: user.body.email,
         password: passwordHashed,
         created_on: new Date()
       })
       .returning(['*'])
-      .then((user) => {
-        const a = jwt.sign({ id: user.id }, config.secret, {
-          expiresIn: 86400, // expires in 24 hours
-        })
-        // res.status().send()
-        // res.json(user, a)
-        // console.log(user, 'New User Create')
-        return a
+      .catch((err) => {
+        console.log(err)
       })
   )
 }
@@ -78,14 +72,18 @@ function userConnexion(req, res, next) {
                 error: 'Unauthorized Access!',
               })
             } else {
-              return jwt.sign(
-                { user: user },
+              const token = jwt.sign(
+                { id: user.id, user },
                 process.env.JWT_SECRET_KEY,
-                { expiresIn: '30s' },
-                (error, token) => {
-                  res.json({ token })
-                },
+                { expiresIn: '30s' } //86400
               )
+
+              return res.status(200).send({
+                id: user.id,
+                first_name: user.first_name,
+                email: user.email,
+                accessToken: token,
+              })
             }
           })
       } else {
@@ -93,18 +91,12 @@ function userConnexion(req, res, next) {
       }
     })
     .catch((err) => {
-      return res.json({ status: 401, message: err + 'Message derreur', data: null })
+      console.log('hey', err)
+      // return res.json({ status: 401, message: err + 'Message derreur', data: null })
     })
-  next()
 }
 
-// res.status(200).send({
-  //             id: user.id,
-  //             username: user.username,
-  //             email: user.email,
-  //             roles: authorities,
-  //             accessToken: token,
-  //           })
+
 
 export default {
   createNewUser,
