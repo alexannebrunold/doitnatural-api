@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken'
-import config from '../config/auth.config.js'
 
-export default function verifyToken(req, res, next) {
+function verifyToken(req, res, next) {
   const bearerHeader = req.headers['authorization']
 
   if (typeof bearerHeader !== 'undefined') {
@@ -9,69 +8,28 @@ export default function verifyToken(req, res, next) {
     const bearerToker = bearer[1]
 
     req.token = bearerToker
-    next()
+    return true
   } else {
     console.log('undefined')
-    return res.status(403)
+    return res.status(403).json({ messsage: 'token is undefined or acces unauthorize' })
   }
 }
 
-// export default async function verifyToken  (req, res, next) {
-//   // console.log(req.body, req.headers.authorization.split(' ')[1]);
-//   const token = req.headers.authorization.split(' ')[1]
-//   const decodedToken = await jwt.verify(token, config.secret)
-//   console.log(decodedToken);
-//   const userId = decodedToken.userId
+function decodedToken(req, res, next) {
+  const x = verifyToken(req, res, next)
+  const decoded = jwt.verify(req.token, process.env.JWT_SECRET_KEY)
+  if (x === true && decoded) {
+    let userId = decoded.user.id
+    req.currentUserId = { userId: userId }
+    next()
+  }
+  else {
+    console.log('non')
+    return res.sendStatus(400)
+  }
+}
 
-
-//   if (req.body.userId && req.body.userId !== userId) {
-//     throw 'Invalid user ID'
-//   } else {
-//     // next()
-//     console.log('coucou');
-//   }
-// //  .catch {
-// //   res.status(401).json({
-// //     error: new Error('Invalid request!')
-// //   })
-// }
-
-// export default function verifyToken(req, res, next) {
-//   console.log(req.headers.authorization, config.secret);
-//   try {
-//     const token = req.headers.authorization.split(' ')[1]
-//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY)
-//     const userId = decodedToken.userId
-
-//     console.log(decodedToken, userId)
-
-//     if (req.body.userId && req.body.userId !== userId) {
-//       throw 'Invalid user ID'
-//     } else {
-//       console.log('heyyyy')
-//       next()
-//     }
-//   }
-//   catch {
-//     res.status(401).json({
-//       error: new Error('Invalid request!')
-//     })
-//   }
-// }
-
-// module.exports = (req, res, next) => {
-//   try {
-//     const token = req.headers.authorization.split(' ')[1]
-//     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET')
-//     const userId = decodedToken.userId
-  //   if (req.body.userId && req.body.userId !== userId) {
-  //     throw 'Invalid user ID'
-  //   } else {
-  //     next()
-  //   }
-  // } catch {
-  //   res.status(401).json({
-  //     error: new Error('Invalid request!')
-  //   })
-  // }
-// }
+export default {
+  verifyToken,
+  decodedToken
+}

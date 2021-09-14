@@ -12,15 +12,19 @@ function getOneRecipe(req, res, next) {
     .first()
 }
 
-function createRecipe(req, res, next) {
-  console.log('REQ', req);
-  db('recipes')
+function createRecipe(req, res) {
+  return db('recipes')
     .insert({
       name: req.body.name,
+      user_id: req.currentUserId.userId,
       // created_on: new Date()
     })
-    .returning(['*'])
-  next()
+    .then(() => {
+      res.json({message : 'recipe created'})
+    })
+    .catch((err) => {
+      res.json({ message: err })
+    })
 }
 
 export default {

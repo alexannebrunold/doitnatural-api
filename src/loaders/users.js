@@ -1,7 +1,6 @@
 import validUser from '../middlewares/validations.js'
 import db from '../config/dbConnection.js'
 import jwt from 'jsonwebtoken'
-import config from '../config/auth.config.js'
 import passwordUtils from '../utils/passwordUtils.js'
 
 function createNewUser(req, res, next) {
@@ -75,7 +74,7 @@ function userConnexion(req, res, next) {
               const token = jwt.sign(
                 { id: user.id, user },
                 process.env.JWT_SECRET_KEY,
-                { expiresIn: '30s' } //86400
+                { expiresIn: '3000s' } //86400
               )
 
               return res.status(200).send({
