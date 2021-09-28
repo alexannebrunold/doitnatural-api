@@ -21,7 +21,7 @@ function getRecipeById(req, res, next) {
     .first()
     .then((recipe) => {
     console.log(recipe);
-      res.json({message : recipe})
+      res.json({ message : recipe })
     })
     .catch((error) => {
       res.json({ message: error })
@@ -33,7 +33,7 @@ function createRecipe(req, res) {
     .insert({
       name: req.body.name,
       user_id: req.currentUserId.userId,
-      // created_on: new Date()
+      created_on: new Date()
     })
     .then(() => {
       res.json({message : 'recipe created'})
