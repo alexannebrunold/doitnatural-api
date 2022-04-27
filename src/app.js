@@ -1,6 +1,4 @@
 import express from 'express'
-// import { json } from 'express'
-// const expresss = express
 const app = express()
 import apiRoutes from './routes/routes.js'
 import dotenv from 'dotenv'

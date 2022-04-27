@@ -43,8 +43,8 @@ function insertNewUserInDb({ user, passwordHashed }) {
         created_on: new Date()
       })
       .returning(['*'])
-      .catch((err) => {
-        console.log(err)
+      .catch((error) => {
+        console.log(error)
       })
   )
 }
@@ -55,7 +55,6 @@ function userIsInDB({ user }) {
       .select('*')
       .where('email', '=', user.email)
       .first()
-      .then((x) => { return x })
   )
 }
 
@@ -90,8 +89,7 @@ function userConnexion(req, res, next) {
       }
     })
     .catch((err) => {
-      console.log('hey', err)
-      // return res.json({ status: 401, message: err + 'Message derreur', data: null })
+      return res.json({ status: 401, message: err + 'Message derreur', data: null })
     })
 }
 
