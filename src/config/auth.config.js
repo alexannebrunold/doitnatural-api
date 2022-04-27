@@ -1,3 +1,3 @@
 export default {
-  secret: 'doitnatural-secret-key',
+  secret: process.env.AUTH_SECRET_KEY,
 }

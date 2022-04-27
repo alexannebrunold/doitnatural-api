@@ -5,27 +5,23 @@ function getAllRecipes(req, res, next) {
     .select('*')
     .where('user_id', '=', req.currentUserId.userId)
     .then((recipes) => {
-      console.log(recipes)
-      res.json({ message: recipes })
+      res.json({ 
+        message: recipes 
+      })
     })
     .catch((error) => {
-      res.json({ message: error })
+      res.json({ 
+        message: error 
+      })
     })
 }
 
 function getRecipeById(req, res, next) {
  db('recipes')
     .select('*')
-   .where('user_id', '=', req.currentUserId.userId)
-   .andWhere('id', '=', req.body.id)
+    .where('user_id', '=', req.currentUserId.userId)
+    .andWhere('id', '=', req.body.id)
     .first()
-    .then((recipe) => {
-    console.log(recipe);
-      res.json({ message : recipe })
-    })
-    .catch((error) => {
-      res.json({ message: error })
-    })
 }
 
 function createRecipe(req, res) {
@@ -36,10 +32,14 @@ function createRecipe(req, res) {
       created_on: new Date()
     })
     .then(() => {
-      res.json({message : 'recipe created'})
+      res.json({ 
+        message : 'recipe created'
+      })
     })
-    .catch((err) => {
-      res.json({ message: err })
+    .catch((error) => {
+      res.json({ 
+        message: error 
+      })
     })
 }
 

@@ -16,9 +16,9 @@ function verifyToken(req, res, next) {
 }
 
 function decodedToken(req, res, next) {
-  const x = verifyToken(req, res, next)
+  const isValidToken = verifyToken(req, res, next)
   const decoded = jwt.verify(req.token, process.env.JWT_SECRET_KEY)
-  if (x === true && decoded) {
+  if (isValidToken === true && decoded) {
     let userId = decoded.user.id
     req.currentUserId = { userId: userId }
     next()
