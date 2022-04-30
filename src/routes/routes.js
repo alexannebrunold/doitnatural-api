@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router()
-import usersLoader from '../query/users.js.js'
+import usersLoader from '../query/users.js'
 import recipesLoader from '../query/recipes.js'
 import token from '../middlewares/token.js'
 
@@ -16,7 +16,6 @@ router.post('/createRecipe', token.decodedToken, recipesLoader.createRecipe)
 //Public
 // User
 router.post('/createUser', usersLoader.createNewUser, (req, res) => {
-  console.log(res);
   res.json(res.body)
 })
 router.post('/login', usersLoader.userConnexion)

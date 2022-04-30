@@ -1,61 +1,54 @@
-import validUser from '../middlewares/validations.js'
-import db from '../config/dbConnection.js'
-import jwt from 'jsonwebtoken'
-import passwordUtils from '../utils/passwordUtils.js'
+import validUser from "../middlewares/validations.js"
+import db from "../config/dbConnection.js"
+import jwt from "jsonwebtoken"
+import passwordUtils from "../utils/passwordUtils.js"
 
 function createNewUser(req, res, next) {
   if (validUser.validUserInformations(req.body)) {
-    userIsInDB({ user: req.body }).then((user) => {
-      if (user === undefined) {
-        passwordUtils.hashPassword(req.body.password).then((passwordHashed) => {
-          insertNewUserInDb({ user: req, passwordHashed })
-            .then((token) => {
-              res.status(200).json({ token: token })
+    userIsInDB({ user: req.body })
+      .then((user) => {
+        if (user === undefined) {
+          passwordUtils
+            .hashPassword(req.body.password)
+            .then((passwordHashed) => {
+              insertNewUserInDb({ user: req, passwordHashed }).then((token) => {
+                res.status(200).json({ token: token })
+              })
             })
-        })
-          .catch((error) => {
-            return console.error('ERRRRRROR', error)
-          })
-      }
-      else {
-        next()
-        console.error('User already exist')
-        // return response500WithMessage(res, 'Les champs sont mal rempli');
-      }
-    })
-      .catch((error) => {
-        return console.error('ERRRRRROR', error)
+            .catch((error) => {
+              return console.error("ERRRRRROR", error)
+            })
+        } else {
+          next()
+          console.error("User already exist")
+          // return response500WithMessage(res, 'Les champs sont mal rempli')
+        }
       })
-  }
-  else {
-    return console.error('Les champs sont mal remplis')
-    // return response500WithMessage(res, 'Les champs sont mal rempli');
+      .catch((error) => {
+        return console.error("ERRRRRROR", error)
+      })
+  } else {
+    return console.error("Les champs sont mal remplis")
+    // return response500WithMessage(res, 'Les champs sont mal rempli')
   }
 }
 
 function insertNewUserInDb({ user, passwordHashed }) {
-  return (
-    db('users')
-      .insert({
-        first_name: user.body.first_name,
-        email: user.body.email,
-        password: passwordHashed,
-        created_on: new Date()
-      })
-      .returning(['*'])
-      .catch((error) => {
-        console.log(error)
-      })
-  )
+  return db("users")
+    .insert({
+      first_name: user.body.first_name,
+      email: user.body.email,
+      password: passwordHashed,
+      created_on: new Date(),
+    })
+    .returning(["*"])
+    .catch((error) => {
+      return error
+    })
 }
 
 function userIsInDB({ user }) {
-  return (
-    db('users')
-      .select('*')
-      .where('email', '=', user.email)
-      .first()
-  )
+  return db("users").select("*").where("email", "=", user.email).first()
 }
 
 function userConnexion(req, res, next) {
@@ -67,13 +60,13 @@ function userConnexion(req, res, next) {
           .then((isPasswordTheSame) => {
             if (!isPasswordTheSame) {
               res.status(401).json({
-                error: 'Unauthorized Access!',
+                error: "Unauthorized Access!",
               })
             } else {
               const token = jwt.sign(
                 { id: user.id, user },
                 process.env.JWT_SECRET_KEY,
-                { expiresIn: '3000s' } //86400
+                { expiresIn: "3000s" } //86400
               )
 
               return res.status(200).send({
@@ -85,18 +78,37 @@ function userConnexion(req, res, next) {
             }
           })
       } else {
-        next(new Error('Invalid Loggin'))
+        next(new Error("Invalid Loggin"))
       }
     })
     .catch((err) => {
-      return res.json({ status: 401, message: err + 'Message derreur', data: null })
+      return res.json({
+        status: 401,
+        message: err + "Message derreur",
+        data: null,
+      })
     })
 }
 
-
+function getUsersRecipes(req, res, next) {
+  db("recipes")
+    .select("*")
+    .where("user_id", "=", req.currentUserId.userId)
+    .then((recipes) => {
+      res.json({
+        message: recipes,
+      })
+    })
+    .catch((error) => {
+      res.json({
+        message: error,
+      })
+    })
+}
 
 export default {
   createNewUser,
   userIsInDB,
-  userConnexion
+  userConnexion,
+  getUsersRecipes,
 }
